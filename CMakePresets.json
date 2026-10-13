@@ -14,6 +14,16 @@
             }
         },
         {
+            "name": "llvm-mos-base",
+            "hidden": true,
+            "inherits": "base",
+            "cacheVariables": {
+                "llvm-mos-sdk_DIR": "$env{HOME}/.rp6502/llvm-mos/lib/cmake/llvm-mos-sdk",
+                "LLVM_MOS": "$env{HOME}/.rp6502/llvm-mos/bin",
+                "LLVM_MOS_PLATFORM": "rp6502"
+            }
+        },
+        {
             "name": "cc65/Debug",
             "displayName": "cc65/Debug",
             "description": "cc65, with debug information",
@@ -39,22 +49,20 @@
             "name": "llvm-mos/Debug",
             "displayName": "llvm-mos/Debug",
             "description": "llvm-mos, with debug information",
-            "inherits": "base",
+            "inherits": "llvm-mos-base",
             "binaryDir": "${sourceDir}/build/llvm-mos/debug",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Debug",
-                "LLVM_MOS_PLATFORM": "rp6502"
+                "CMAKE_BUILD_TYPE": "Debug"
             }
         },
         {
             "name": "llvm-mos/Release",
             "displayName": "llvm-mos/Release",
             "description": "llvm-mos, optimized",
-            "inherits": "base",
+            "inherits": "llvm-mos-base",
             "binaryDir": "${sourceDir}/build/llvm-mos/release",
             "cacheVariables": {
-                "CMAKE_BUILD_TYPE": "Release",
-                "LLVM_MOS_PLATFORM": "rp6502"
+                "CMAKE_BUILD_TYPE": "Release"
             }
         },
         {
