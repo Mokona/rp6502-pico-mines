@@ -5,4 +5,6 @@
 int main(void)
 {
     puts("Hello, world!");
+
+    while (true);
 }
