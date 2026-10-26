@@ -1,0 +1,23 @@
+#ifndef MY_RP6502_PROJECT_INPUT_ACTIONS_H
+#define MY_RP6502_PROJECT_INPUT_ACTIONS_H
+
+#include <stdbool.h>
+#include <stdint.h>
+
+typedef struct
+{
+    uint8_t pointer_x;
+    uint8_t pointer_y;
+    bool pointer_moved;
+    bool just_pressed_up;
+    bool just_pressed_down;
+    bool just_pressed_left;
+    bool just_pressed_right;
+    bool just_pressed_action;
+    uint8_t dpad;
+} actions_t;
+
+void input_action_init();
+const actions_t * input_action_update();
+
+#endif // MY_RP6502_PROJECT_INPUT_ACTIONS_H
