@@ -6,8 +6,8 @@
 
 typedef struct
 {
-    uint8_t pointer_x;
-    uint8_t pointer_y;
+    uint16_t pointer_x;
+    uint16_t pointer_y;
     bool pointer_moved;
     bool just_pressed_up;
     bool just_pressed_down;

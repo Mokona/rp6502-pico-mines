@@ -60,10 +60,10 @@ const actions_t *input_action_update()
     // Tablet
     tablet_read(&tab);
 
-    const uint8_t old_x = actions.pointer_x;
-    const uint8_t old_y = actions.pointer_y;
-    const uint8_t x = (tab.contact.yx_hi & 0x0F) << 8 | tab.contact.x_lo;
-    const uint8_t y = (tab.contact.yx_hi >> 4) << 8 | tab.contact.y_lo;
+    const uint16_t old_x = actions.pointer_x;
+    const uint16_t old_y = actions.pointer_y;
+    const uint16_t x = (tab.contact.yx_hi & 0x0F) << 8 | tab.contact.x_lo;
+    const uint16_t y = (tab.contact.yx_hi >> 4) << 8 | tab.contact.y_lo;
 
     if (old_x != x || old_y != y)
     {
