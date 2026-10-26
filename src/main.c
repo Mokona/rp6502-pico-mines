@@ -25,11 +25,13 @@ int main(void)
 
     keyboard_t kb;
     tablet_pointer_t tab;
+    gamepad_player_t p1;
 
     unsigned x = 0, y = 0;
 
     xreg_ria_keyboard(XRAM_KEYBOARD);
     xreg_ria_tablet(XRAM_TABLET);
+    xreg_ria_gamepad(XRAM_GAMEPAD);
 
     while (true)
     {
@@ -49,6 +51,16 @@ int main(void)
         if (old_x != x || old_y != y)
         {
             printf("x=%d y=%d\n", old_x, old_y);
+        }
+
+        xram0_read(&p1, XRAM_GAMEPAD, sizeof(p1));
+        if (p1.dpad & GAMEPAD_DPAD_LEFT)
+        {
+            puts("DPAD_LEFT");
+        }
+        if (p1.btn0 & GAMEPAD_BTN0_A)
+        {
+            puts("BTN0_A");
         }
     }
 }
