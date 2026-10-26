@@ -22,7 +22,6 @@ int main(void)
     };
 
     xram0_set(XRAM_TILEMAP_DATA, 0, sizeof(uint8_t) * TILEMAP_SIZE_IN_TILES);
-    xram0_set(XRAM_TILES, 0, sizeof(tile_t) * MAX_TILES);
 
     xram0_write(XRAM_TILEMAP_CONFIG, &tilemap_config, sizeof(tilemap_config));
 
