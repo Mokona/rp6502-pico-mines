@@ -131,17 +131,85 @@ typedef struct
     gamepad_player_t player[GAMEPAD_PLAYERS];
 } gamepad_t; /* layout */
 
-// XRAM LAYOUR
+// DISPLAY
+#define xreg_vga_canvas(...) xreg(0x1, 0x0, 0x00, __VA_ARGS__)
+
+#define CANVAS_CONSOLE 0
+#define CANVAS_320X240 1
+#define CANVAS_320X180 2
+#define CANVAS_640X480 3
+#define CANVAS_640X360 4
+#define CANVAS_320X200 5
+#define CANVAS_640X400 6
+
+#define COLOR_FROM_RGBA(r, g, b, alpha) ((((unsigned)(b) >> 3) << 11) | (((unsigned)(g) >> 3) << 6) | (((unsigned)(alpha) >> 7) << 5) | ((unsigned)(r) >> 3))
+
+// r, g, and b are 0 to 5, for the levels 0, 95, 135, 175, 215, and 255.
+#define ANSI_CUBE(r, g, b) (16 + (r) * 36 + (g) * 6 + (b))
+
+// k is 0 to 25: black, then #080808 to #EEEEEE in steps of #0A0A0A,then white.
+#define ANSI_GRAY(k) ((k) ? 231 + (k) % 25 : 16)
+
+#define xreg_vga_mode2(...) xreg(0x1, 0x0, 0x01, 2, __VA_ARGS__)
+
+#define MODE2_1BPP 0x00
+#define MODE2_2BPP 0x01
+#define MODE2_4BPP 0x02
+#define MODE2_8BPP 0x03
+
+#define MODE2_8X8 0x00
+#define MODE2_16X16 0x08
+
+#define MODE2_X_TRIM(cols) ((cols) << 4)
+#define MODE2_Y_TRIM(rows) ((rows) << 8)
+
+#define MODE2_TILE(bpp, size)                                                                                                                                  \
+    struct                                                                                                                                                     \
+    {                                                                                                                                                          \
+        struct                                                                                                                                                 \
+        {                                                                                                                                                      \
+            uint8_t cols[(size) * (bpp) / 8];                                                                                                                  \
+        } rows[size];                                                                                                                                          \
+    }
+
+// Tiles in thie game are 16x16 in 8 bit palette mode
+typedef MODE2_TILE(8, 16) tile_t;
+
+typedef struct
+{
+    bool x_wrap;
+    bool y_wrap;
+    int16_t x_pos_px;
+    int16_t y_pos_px;
+    int16_t width_tiles;
+    int16_t height_tiles;
+    uint16_t xram_data_ptr;
+    uint16_t xram_palette_ptr;
+    uint16_t xram_tile_ptr;
+} mode2_config_t; /* layout */
+
+// XRAM LAYOUT
+#define MAX_TILES 20
+#define WIDTH_IN_TILES 20
+#define HEIGHT_IN_TILES 15
+#define TILEMAP_SIZE_IN_TILES (WIDTH_IN_TILES * HEIGHT_IN_TILES)
+
 typedef struct
 {
     keyboard_t keyboard;
     tablet_t tablet;
     gamepad_player_t gamepad;
+    uint8_t tilemap_data[TILEMAP_SIZE_IN_TILES];
+    tile_t tiles[MAX_TILES];
+    mode2_config_t tilemap_config;
 } xram_layout_t;
 
 /* Define constants to be your XRAM addresses. */
 #define XRAM_KEYBOARD offsetof(xram_layout_t, keyboard)
 #define XRAM_TABLET offsetof(xram_layout_t, tablet)
 #define XRAM_GAMEPAD offsetof(xram_layout_t, gamepad)
+#define XRAM_TILEMAP_CONFIG offsetof(xram_layout_t, tilemap_config)
+#define XRAM_TILEMAP_DATA offsetof(xram_layout_t, tilemap_data)
+#define XRAM_TILES offsetof(xram_layout_t, tiles)
 
 #endif
