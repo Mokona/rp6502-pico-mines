@@ -25,5 +25,7 @@ else ()
             src/input_actions.h
             src/display.c
             src/display.h
+            src/board.c
+            src/board.h
     )
 endif ()
