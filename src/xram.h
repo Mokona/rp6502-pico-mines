@@ -270,7 +270,7 @@ typedef struct
     tablet_t tablet;
     gamepad_player_t gamepad[GAMEPAD_PLAYERS];
     uint8_t tilemap_data[TILEMAP_SIZE_IN_TILES];
-    tile_t tiles[MAX_TILES];
+    tile_t tiles[MAX_TILES + 1];
     mode2_config_t tilemap_config;
     // sprite_2bpp_t sprites[MAX_SPRITES];
     // mode5_sprite_t sprite_config[MAX_SPRITES];

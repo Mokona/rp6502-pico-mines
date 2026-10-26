@@ -22,9 +22,9 @@ void display_init()
     xram0_write(XRAM_TILEMAP_CONFIG, &tilemap_config, sizeof(tilemap_config));
     xreg_vga_mode2(MODE2_8BPP | MODE2_16X16, XRAM_TILEMAP_CONFIG, 2);
 
-    for (int i = 0; i < TILEMAP_SIZE_IN_TILES; ++i)
+    for (int i = 0; i < MAX_TILES; ++i)
     {
-        xram0_poke8(XRAM_TILEMAP_DATA + i, i % MAX_TILES);
+        xram0_poke8(XRAM_TILEMAP_DATA + i, i);
     }
 
 #ifdef CURSOR_AS_SPRITE
