@@ -1,6 +1,5 @@
 ## Display
 
-- Display initial board
 - Display surroundings
 - Display status information
 - Use sprite when hovering a cell
@@ -8,11 +7,13 @@
 ## Assets
 
 - Fix the asset colors and some rogue pixels
+- Add background/border cells to color the whole area
+- Remove the void tile when background tiles are there
 
 ## Gameplay
 
-- Initialize board
-- Press on a tile
+- Initialize board (Next)
+- Press on a tile (Next)
 - Auto discover
 - Put a flag
 
