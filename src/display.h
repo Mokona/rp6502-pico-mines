@@ -1,0 +1,7 @@
+
+#ifndef MY_RP6502_PROJECT_DISPLAY_H
+#define MY_RP6502_PROJECT_DISPLAY_H
+
+void display_init();
+
+#endif // MY_RP6502_PROJECT_DISPLAY_H

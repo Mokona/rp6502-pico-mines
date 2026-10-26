@@ -23,5 +23,7 @@ else ()
             src/main.c
             src/input_actions.c
             src/input_actions.h
+            src/display.c
+            src/display.h
     )
 endif ()
