@@ -7,7 +7,7 @@
 
 ## Assets
 
-- Cut the tileset and make them resources
+- Fix the asset colors and some rogue pixels
 
 ## Gameplay
 
