@@ -14,7 +14,7 @@ else ()
     add_executable(pico-mines)
     rp6502_align(pico-mines "XRAM_.*")
     rp6502_asset(pico-mines help src/help.txt)
-    rp6502_asset(pico-mines XRAM(XRAM_TILES) src/data/cell_hidden.bin)
+    rp6502_asset(pico-mines XRAM(XRAM_TILES) src/generated/tile_atlas.bin)
     rp6502_executable(pico-mines DATA default RESET default)
     rp6502_web(pico-mines CONFIG [[
             title: 'Pico Mines',

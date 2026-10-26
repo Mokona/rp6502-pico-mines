@@ -8,6 +8,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+#include "generated/tile_atlas.h"
+
 // Keyboard
 typedef struct
 {
@@ -256,7 +258,6 @@ typedef struct
 
 
 // XRAM LAYOUT
-#define MAX_TILES 20
 #define WIDTH_IN_TILES 20
 #define HEIGHT_IN_TILES 15
 #define TILEMAP_SIZE_IN_TILES (WIDTH_IN_TILES * HEIGHT_IN_TILES)
@@ -267,7 +268,7 @@ typedef struct
 {
     keyboard_t keyboard;
     tablet_t tablet;
-    gamepad_player_t gamepad;
+    gamepad_player_t gamepad[GAMEPAD_PLAYERS];
     uint8_t tilemap_data[TILEMAP_SIZE_IN_TILES];
     tile_t tiles[MAX_TILES];
     mode2_config_t tilemap_config;

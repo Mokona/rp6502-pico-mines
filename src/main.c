@@ -21,11 +21,16 @@ int main(void)
         .xram_tile_ptr = XRAM_TILES,
     };
 
-    xram0_set(XRAM_TILEMAP_DATA, 0, sizeof(uint8_t) * TILEMAP_SIZE_IN_TILES);
+    //    xram0_set(XRAM_TILEMAP_DATA, 0, sizeof(uint8_t) * TILEMAP_SIZE_IN_TILES);
 
     xram0_write(XRAM_TILEMAP_CONFIG, &tilemap_config, sizeof(tilemap_config));
 
     xreg_vga_mode2(MODE2_8BPP | MODE2_16X16, XRAM_TILEMAP_CONFIG, 2);
+
+    for (int i = 0; i < TILEMAP_SIZE_IN_TILES; ++i)
+    {
+        xram0_poke8(XRAM_TILEMAP_DATA + i, i % MAX_TILES);
+    }
 
 #ifdef CURSOR_AS_SPRITE
     // Sprites
@@ -64,7 +69,6 @@ int main(void)
             sprite_config.y_pos_px = actions->pointer_y;
             xram0_write(XRAM_SPRITE_CONFIG + 0 * sizeof(mode5_sprite_t), &sprite_config, sizeof(mode5_sprite_t));
 #endif
-
         }
 
         if (actions->just_pressed_left)
