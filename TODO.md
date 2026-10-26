@@ -2,7 +2,8 @@
 
 - Display initial board
 - Display surroundings
-- Display status informations
+- Display status information
+- Use sprite when hovering a cell
 
 ## Assets
 
