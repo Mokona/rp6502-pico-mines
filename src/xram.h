@@ -150,6 +150,7 @@ typedef struct
 // k is 0 to 25: black, then #080808 to #EEEEEE in steps of #0A0A0A,then white.
 #define ANSI_GRAY(k) ((k) ? 231 + (k) % 25 : 16)
 
+// MODE 2
 #define xreg_vga_mode2(...) xreg(0x1, 0x0, 0x01, 2, __VA_ARGS__)
 
 #define MODE2_1BPP 0x00
@@ -188,11 +189,79 @@ typedef struct
     uint16_t xram_tile_ptr;
 } mode2_config_t; /* layout */
 
+// MODE 5 (SPRITES)
+
+#define xreg_vga_mode5(...) xreg(0x1, 0x0, 0x01, 5, __VA_ARGS__)
+
+#define MODE5_1BPP 0x00
+#define MODE5_2BPP 0x01
+#define MODE5_4BPP 0x02
+#define MODE5_8BPP 0x03
+
+#define MODE5_8X8 0x00
+#define MODE5_16X16 0x08
+#define MODE5_32X32 0x10
+#define MODE5_64X64 0x18
+#define MODE5_128X128 0x20
+#define MODE5_256X256 0x28
+#define MODE5_512X512 0x30
+#define MODE5_CUSTOM 0x38
+
+#define MODE5_HFLIP 0x10
+#define MODE5_VFLIP 0x20
+#define MODE5_HDOUBLE 0x40
+#define MODE5_VDOUBLE 0x80
+
+#define MODE5_IMAGE(bpp, size)                                                                                                                                 \
+    struct                                                                                                                                                     \
+    {                                                                                                                                                          \
+        struct                                                                                                                                                 \
+        {                                                                                                                                                      \
+            uint8_t cols[(size) * (bpp) / 8];                                                                                                                  \
+        } rows[size];                                                                                                                                          \
+    }
+
+typedef MODE5_IMAGE(2, 16) sprite_2bpp_t;
+
+#define MODE5_SIZE(width, height) ((((height) / 4 - 1) << 4) | ((width) / 4 - 1))
+
+#define MODE5_CUSTOM_IMAGE(bpp, width, height)                                                                                                                 \
+    struct                                                                                                                                                     \
+    {                                                                                                                                                          \
+        struct                                                                                                                                                 \
+        {                                                                                                                                                      \
+            uint8_t cols[((width) * (bpp) + 7) / 8];                                                                                                           \
+        } rows[height];                                                                                                                                        \
+    }
+
+#define MODE5_PALETTE_CHECK(type) _Static_assert(sizeof(type) / sizeof(uint16_t) <= 512, #type " holds more than 512 colors.")
+
+typedef struct
+{
+    int16_t x_pos_px;
+    int16_t y_pos_px;
+    uint16_t xram_sprite_ptr;
+    uint16_t palette_ptr;
+} mode5_sprite_t; /* layout */
+
+// typedef struct
+// {
+//     int16_t x_pos_px;
+//     int16_t y_pos_px;
+//     uint16_t xram_sprite_ptr;
+//     uint16_t palette_ptr;
+//     uint8_t width_height;
+//     uint8_t attributes;
+// } mode5_csprite_t; /* layout */
+
+
 // XRAM LAYOUT
 #define MAX_TILES 20
 #define WIDTH_IN_TILES 20
 #define HEIGHT_IN_TILES 15
 #define TILEMAP_SIZE_IN_TILES (WIDTH_IN_TILES * HEIGHT_IN_TILES)
+
+#define MAX_SPRITES 1
 
 typedef struct
 {
@@ -202,6 +271,8 @@ typedef struct
     uint8_t tilemap_data[TILEMAP_SIZE_IN_TILES];
     tile_t tiles[MAX_TILES];
     mode2_config_t tilemap_config;
+    // sprite_2bpp_t sprites[MAX_SPRITES];
+    // mode5_sprite_t sprite_config[MAX_SPRITES];
 } xram_layout_t;
 
 /* Define constants to be your XRAM addresses. */
@@ -211,5 +282,7 @@ typedef struct
 #define XRAM_TILEMAP_CONFIG offsetof(xram_layout_t, tilemap_config)
 #define XRAM_TILEMAP_DATA offsetof(xram_layout_t, tilemap_data)
 #define XRAM_TILES offsetof(xram_layout_t, tiles)
+#define XRAM_SPRITE_CONFIG offsetof(xram_layout_t, sprite_config)
+#define XRAM_SPRITES offsetof(xram_layout_t, sprites)
 
 #endif
