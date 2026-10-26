@@ -46,7 +46,7 @@ int main(void)
 #endif
 
     //
-    puts("Hello, world!");
+    puts("Program starting");
 
     input_action_init();
 
