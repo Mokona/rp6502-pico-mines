@@ -61,6 +61,9 @@ int main(void)
 
     draw_board();
 
+    uint8_t old_hover_x = 0;
+    uint8_t old_hover_y = 0;
+
     while (true)
     {
         // Vsync
@@ -73,7 +76,25 @@ int main(void)
 
         if (actions->pointer_moved)
         {
-            printf("x=%d y=%d\n", actions->pointer_x, actions->pointer_y);
+            // printf("x=%d y=%d\n", actions->pointer_x, actions->pointer_y);
+
+            const int8_t tentative_hover_cell_x = (int8_t)(actions->pointer_x / 16 - BOARD_DISPLAY_X);
+            const int8_t tentative_hover_cell_y = (int8_t)(actions->pointer_y / 16 - BOARD_DISPLAY_Y);
+
+            if ((tentative_hover_cell_x >= 0 && tentative_hover_cell_x < get_board_width()) &&
+                (tentative_hover_cell_y >= 0 && tentative_hover_cell_y < get_board_height()))
+            {
+                const uint8_t hover_cell_x = tentative_hover_cell_x;
+                const uint8_t hover_cell_y = tentative_hover_cell_y;
+
+                if (hover_cell_x != old_hover_x || hover_cell_y != old_hover_y)
+                {
+                    printf("x=%d y=%d\n", hover_cell_x, hover_cell_y);
+
+                    old_hover_x = hover_cell_x;
+                    old_hover_y = hover_cell_y;
+                }
+            }
 
 #ifdef CURSOR_AS_SPRITE
             sprite_config.x_pos_px = actions->pointer_x;
