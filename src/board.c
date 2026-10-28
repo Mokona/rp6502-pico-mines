@@ -54,6 +54,11 @@ static uint8_t compute_close_mine_count(uint8_t x, uint8_t y)
             {
                 continue;
             }
+            if (x + dx >= BOARD_WIDTH || y + dy >= BOARD_HEIGHT)
+            {
+                continue;
+            }
+
             if (board_content[XY_TO_INDEX(x + dx, y + dy)] == CELL_MINE_MARKER)
             {
                 mine_count += 1;
