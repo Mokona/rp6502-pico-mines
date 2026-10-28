@@ -23,5 +23,6 @@ uint8_t get_cell_content(uint8_t x, uint8_t y);
 ECell_t get_cell_type(uint8_t x, uint8_t y);
 
 void press_on_cell(uint8_t x, uint8_t y);
+void board_reveal();
 
 #endif // MY_RP6502_PROJECT_BOARD_H

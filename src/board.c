@@ -1,8 +1,9 @@
 #include "board.h"
 
-#include <stdbool.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
+#include <stdbool.h>
 
 // Hard coded at the moment
 #define BOARD_WIDTH 10
@@ -71,8 +72,7 @@ static void compute_hints()
     {
         for (int x = 0; x < w; x++)
         {
-            uint8_t *cell = &board_content[XY_TO_INDEX(x, y)];
-            if (*cell != CELL_MINE_MARKER)
+            if (uint8_t *cell = &board_content[XY_TO_INDEX(x, y)]; *cell != CELL_MINE_MARKER)
             {
                 *cell = compute_close_mine_count(x, y);
             }
@@ -84,10 +84,12 @@ static void distribute_mines(uint8_t x, uint8_t y)
 {
     uint8_t mine_count = MINE_COUNT;
 
+    srand(time(NULL));
+
     while (mine_count > 0)
     {
-        uint8_t mine_x = rand() % BOARD_WIDTH;  // NOLINT(*-msc50-cpp)
-        uint8_t mine_y = rand() % BOARD_HEIGHT; // NOLINT(*-msc50-cpp)
+        const uint8_t mine_x = rand() % BOARD_WIDTH;  // NOLINT(*-msc50-cpp)
+        const uint8_t mine_y = rand() % BOARD_HEIGHT; // NOLINT(*-msc50-cpp)
 
         if (abs(mine_x - x) <= 1 && abs(mine_y - y) <= 1)
         {
@@ -98,6 +100,23 @@ static void distribute_mines(uint8_t x, uint8_t y)
         mine_count -= 1;
     }
     board_distributed = true;
+}
+
+void board_reveal()
+{
+    const uint8_t h = get_board_height();
+    const uint8_t w = get_board_width();
+
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            if (ECell_t *status = &board_status[XY_TO_INDEX(x, y)]; *status == ECell_Hidden)
+            {
+                *status = ECell_Uncovered;
+            }
+        }
+    }
 }
 
 void press_on_cell(uint8_t x, uint8_t y)
