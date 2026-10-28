@@ -116,6 +116,8 @@ int main(void)
         if (actions->just_pressed_action)
         {
             printf("Press Cell %u %u\n", old_hover_x, old_hover_y);
+            press_on_cell(old_hover_x, old_hover_y);
+            draw_board(); // TODO: optimize by displaying only the changed cell
         }
     }
 }

@@ -9,6 +9,7 @@
 - Fix the asset colors and some rogue pixels
 - Add background/border cells to color the whole area
 - Remove the void tile when background tiles are there
+- Add an element for generic hover (selected square ?)
 
 ## Gameplay
 
