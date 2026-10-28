@@ -55,12 +55,16 @@ static uint8_t compute_close_mine_count(uint8_t x, uint8_t y)
             {
                 continue;
             }
-            if (x + dx >= BOARD_WIDTH || y + dy >= BOARD_HEIGHT)
+
+            const int8_t xdx = x + dx;
+            const int8_t ydy = y + dy;
+
+            if (xdx < 0 || xdx >= BOARD_WIDTH || ydy < 0 || ydy >= BOARD_HEIGHT)
             {
                 continue;
             }
 
-            if (board_content[XY_TO_INDEX(x + dx, y + dy)] == CELL_MINE_MARKER)
+            if (board_content[XY_TO_INDEX(xdx, ydy)] == CELL_MINE_MARKER)
             {
                 mine_count += 1;
             }

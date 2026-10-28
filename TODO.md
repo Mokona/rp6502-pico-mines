@@ -1,7 +1,3 @@
-## Bug
-
-- Hint count is wrong on left border of board
-- 
 ## Display
 
 - Display surroundings
