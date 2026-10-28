@@ -95,6 +95,11 @@ int main(void)
                     old_hover_y = hover_cell_y;
                 }
             }
+            else
+            {
+                old_hover_x = 0xff;
+                old_hover_y = 0xff;
+            }
 
 #ifdef CURSOR_AS_SPRITE
             sprite_config.x_pos_px = actions->pointer_x;
@@ -110,7 +115,7 @@ int main(void)
 
         if (actions->just_pressed_action)
         {
-            puts("ACTION");
+            printf("Press Cell %u %u\n", old_hover_x, old_hover_y);
         }
     }
 }

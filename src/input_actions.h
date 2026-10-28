@@ -15,6 +15,7 @@ typedef struct
     bool just_pressed_right;
     bool just_pressed_action;
     uint8_t dpad;
+    uint8_t tablet_status;
 } actions_t;
 
 void input_action_init();

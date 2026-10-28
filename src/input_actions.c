@@ -76,6 +76,10 @@ const actions_t *input_action_update()
         actions.pointer_moved = false;
     }
 
+    const uint8_t old_tablet_status = actions.tablet_status;
+    actions.just_pressed_action |= (tab.contact.flags & TABLET_FLAG_LEFT) && !(old_tablet_status & TABLET_FLAG_LEFT);
+    actions.tablet_status = tab.contact.flags;
+
     // Gamepad
     const uint8_t old_dpad = actions.dpad;
     xram0_read(&p1, XRAM_GAMEPAD, sizeof(p1));
