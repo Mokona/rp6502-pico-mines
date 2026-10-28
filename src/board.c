@@ -42,6 +42,44 @@ ECell_t get_cell_type(uint8_t x, uint8_t y)
     return board_status[XY_TO_INDEX(x, y)];
 }
 
+static uint8_t compute_close_mine_count(uint8_t x, uint8_t y)
+{
+    uint8_t mine_count = 0;
+    for (int8_t dy = -1; dy <= 1; dy++)
+    {
+        for (int8_t dx = -1; dx <= 1; dx++)
+        {
+            if (dx == 0 && dy == 0)
+            {
+                continue;
+            }
+            if (board_content[XY_TO_INDEX(x + dx, y + dy)] == CELL_MINE_MARKER)
+            {
+                mine_count += 1;
+            }
+        }
+    }
+    return mine_count;
+}
+
+static void compute_hints()
+{
+    const uint8_t h = get_board_height();
+    const uint8_t w = get_board_width();
+
+    for (int y = 0; y < h; y++)
+    {
+        for (int x = 0; x < w; x++)
+        {
+            uint8_t *cell = &board_content[XY_TO_INDEX(x, y)];
+            if (*cell != CELL_MINE_MARKER)
+            {
+                *cell = compute_close_mine_count(x, y);
+            }
+        }
+    }
+}
+
 static void distribute_mines(uint8_t x, uint8_t y)
 {
     uint8_t mine_count = MINE_COUNT;
@@ -72,6 +110,7 @@ void press_on_cell(uint8_t x, uint8_t y)
     if (!board_distributed)
     {
         distribute_mines(x, y);
+        compute_hints();
     }
 
     if (get_cell_type(x, y) == ECell_Hidden)
