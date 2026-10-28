@@ -89,7 +89,7 @@ int main(void)
 
                 if (hover_cell_x != old_hover_x || hover_cell_y != old_hover_y)
                 {
-                    printf("x=%d y=%d\n", hover_cell_x, hover_cell_y);
+                    // printf("x=%d y=%d\n", hover_cell_x, hover_cell_y);
 
                     old_hover_x = hover_cell_x;
                     old_hover_y = hover_cell_y;
@@ -115,7 +115,7 @@ int main(void)
 
         if (actions->just_pressed_action)
         {
-            //printf("Press Cell %u %u\n", old_hover_x, old_hover_y);
+            // printf("Press Cell %u %u\n", old_hover_x, old_hover_y);
             press_on_cell(old_hover_x, old_hover_y);
             draw_board(); // TODO: optimize by displaying only the changed cell
 
@@ -123,7 +123,12 @@ int main(void)
             if (cell == ECell_Exploded)
             {
                 // Game over
-                board_reveal();
+                board_full_reveal();
+                draw_board();
+            }
+            else
+            {
+                board_partial_reveal(old_hover_x, old_hover_y);
                 draw_board();
             }
         }

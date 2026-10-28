@@ -1,9 +1,10 @@
 #include "board.h"
 
+#include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#include <stdbool.h>
 
 // Hard coded at the moment
 #define BOARD_WIDTH 10
@@ -107,7 +108,7 @@ static void distribute_mines(uint8_t x, uint8_t y)
     board_distributed = true;
 }
 
-void board_reveal()
+void board_full_reveal()
 {
     const uint8_t h = get_board_height();
     const uint8_t w = get_board_width();
@@ -122,6 +123,110 @@ void board_reveal()
             }
         }
     }
+}
+
+#define MAX_REVEAL_QUEUE 15
+static uint8_t reveal_queue_x[MAX_REVEAL_QUEUE];
+static uint8_t reveal_queue_y[MAX_REVEAL_QUEUE];
+static uint8_t reveal_queue_index;
+static uint8_t max_queue_index;
+
+static bool queue_has(uint8_t x, uint8_t y)
+{
+    for (uint8_t i = 0; i < reveal_queue_index; i++)
+    {
+        if (reveal_queue_x[i] == x && reveal_queue_y[i] == y)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
+#define max(x, y) (x > y ? x : y)
+
+static void add_to_queue(uint8_t x, uint8_t y)
+{
+    if (queue_has(x, y) || reveal_queue_index == MAX_REVEAL_QUEUE)
+    {
+        return;
+    }
+    reveal_queue_x[reveal_queue_index] = x;
+    reveal_queue_y[reveal_queue_index] = y;
+    reveal_queue_index += 1;
+
+    max_queue_index = max(max_queue_index, reveal_queue_index);
+}
+
+static uint8_t front_x()
+{
+    return reveal_queue_x[reveal_queue_index - 1];
+}
+
+static uint8_t front_y()
+{
+    return reveal_queue_y[reveal_queue_index - 1];
+}
+
+static void pop_queue()
+{
+    reveal_queue_index -= 1;
+}
+
+static bool has_queue_element()
+{
+    return reveal_queue_index > 0;
+}
+
+static void board_step_partial_reveal(uint8_t x, uint8_t y)
+{
+    for (int8_t dy = -1; dy <= 1; dy++)
+    {
+        for (int8_t dx = -1; dx <= 1; dx++)
+        {
+            if (dx == 0 && dy == 0)
+            {
+                continue;
+            }
+            const int8_t xdx = x + dx;
+            const int8_t ydy = y + dy;
+            if (xdx < 0 || xdx >= BOARD_WIDTH || ydy < 0 || ydy >= BOARD_HEIGHT)
+            {
+                continue;
+            }
+
+            const uint8_t index = XY_TO_INDEX(xdx, ydy);
+
+            if (board_status[index] == ECell_Hidden && board_content[index] != CELL_MINE_MARKER)
+            {
+                board_status[index] = ECell_Uncovered;
+                if (board_content[index] == 0)
+                {
+                    add_to_queue(xdx, ydy);
+                }
+            }
+        }
+    }
+}
+
+void board_partial_reveal(uint8_t x, uint8_t y)
+{
+    if (board_content[XY_TO_INDEX(x, y)] != 0)
+    {
+        return;
+    }
+    reveal_queue_index = 0;
+    max_queue_index = 0;
+    add_to_queue(x, y);
+    while (has_queue_element())
+    {
+        const uint8_t fx = front_x();
+        const uint8_t fy = front_y();
+        pop_queue();
+
+        board_step_partial_reveal(fx, fy);
+    }
+    printf("Max queue: %u\n", max_queue_index);
 }
 
 void press_on_cell(uint8_t x, uint8_t y)
