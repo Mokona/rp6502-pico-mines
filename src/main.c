@@ -162,6 +162,7 @@ int main(void)
         {
             flag_on_cell(old_hover_x, old_hover_y);
             draw_board(); // TODO: optimize by displaying only the changed cell
+            draw_flags(MINE_COUNT - get_flag_count());
         }
     }
 }

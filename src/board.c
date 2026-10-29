@@ -6,15 +6,13 @@
 #include <string.h>
 #include <time.h>
 
-// Hard coded at the moment
-#define BOARD_WIDTH 10
-#define BOARD_HEIGHT 10
-#define MINE_COUNT 10
+#include "game_config.h"
 
 static bool board_distributed;
 static uint8_t board_content[BOARD_WIDTH * BOARD_HEIGHT];
 static ECell_t board_status[BOARD_WIDTH * BOARD_HEIGHT];
 static uint8_t uncovered_count;
+static uint8_t places_flag_count;
 
 #define XY_TO_INDEX(x, y) ((x) + (y) * BOARD_WIDTH)
 
@@ -24,6 +22,7 @@ void board_init()
     memset(board_status, ECell_Hidden, sizeof(board_status));
     board_distributed = false;
     uncovered_count = 0;
+    places_flag_count = 0;
 }
 
 uint8_t get_board_width()
@@ -284,9 +283,16 @@ void flag_on_cell(uint8_t x, uint8_t y)
     if (get_cell_type(x, y) == ECell_Hidden)
     {
         board_status[XY_TO_INDEX(x, y)] = ECell_Flag;
+        places_flag_count += 1;
     }
     else if (get_cell_type(x, y) == ECell_Flag)
     {
         board_status[XY_TO_INDEX(x, y)] = ECell_Hidden;
+        places_flag_count -= 1;
     }
+}
+
+uint8_t get_flag_count()
+{
+    return places_flag_count;
 }

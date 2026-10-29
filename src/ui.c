@@ -29,6 +29,11 @@ void draw_sad_face()
     display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_SAD);
 }
 
+void draw_flags(uint8_t count)
+{
+    display_number_at(COUNTER_FACE_X + 10, BOARD_DISPLAY_Y - 2, count, 2);
+}
+
 void draw_ui()
 {
     display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_TIME);
@@ -38,5 +43,5 @@ void draw_ui()
     display_number_at(COUNTER_FACE_X + 7, BOARD_DISPLAY_Y - 2, 1, 1);
 
     display_tile_at(COUNTER_FACE_X + 9, BOARD_DISPLAY_Y - 2, UI_FLAG);
-    display_number_at(COUNTER_FACE_X + 10, BOARD_DISPLAY_Y - 2, 0, 2);
+    draw_flags(10);
 }

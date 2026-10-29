@@ -28,6 +28,7 @@ void board_full_reveal();
 void board_partial_reveal(uint8_t x, uint8_t y);
 
 void flag_on_cell(uint8_t x, uint8_t y);
+uint8_t get_flag_count();
 
 bool has_won();
 
