@@ -9,6 +9,28 @@
 #define BOARD_DISPLAY_X 5
 #define BOARD_DISPLAY_Y 3
 
+static void draw_board_borders()
+{
+    const uint8_t h = get_board_height();
+    const uint8_t w = get_board_width();
+
+    for (int x = 0; x < w; x++)
+    {
+        display_tile_at(BOARD_DISPLAY_X + x, BOARD_DISPLAY_Y - 1, BORDER_U);
+        display_tile_at(BOARD_DISPLAY_X + x, BOARD_DISPLAY_Y + h, BORDER_D);
+    }
+    for (int y = 0; y < h; y++)
+    {
+        display_tile_at(BOARD_DISPLAY_X - 1, BOARD_DISPLAY_Y + y, BORDER_L);
+        display_tile_at(BOARD_DISPLAY_X + w, BOARD_DISPLAY_Y + y, BORDER_R);
+    }
+
+    display_tile_at(BOARD_DISPLAY_X - 1, BOARD_DISPLAY_Y - 1, BORDER_UL);
+    display_tile_at(BOARD_DISPLAY_X + w, BOARD_DISPLAY_Y - 1, BORDER_UR);
+    display_tile_at(BOARD_DISPLAY_X + w, BOARD_DISPLAY_Y + h, BORDER_DR);
+    display_tile_at(BOARD_DISPLAY_X - 1, BOARD_DISPLAY_Y + h, BORDER_DL);
+}
+
 static void draw_board()
 {
     const uint8_t h = get_board_height();
@@ -60,6 +82,7 @@ int main(void)
     board_init();
 
     draw_board();
+    draw_board_borders();
 
     uint8_t old_hover_x = 0;
     uint8_t old_hover_y = 0;
