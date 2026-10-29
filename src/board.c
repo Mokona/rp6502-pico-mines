@@ -273,3 +273,20 @@ void press_on_cell(uint8_t x, uint8_t y)
         uncovered_count += 1;
     }
 }
+
+void flag_on_cell(uint8_t x, uint8_t y)
+{
+    if (x >= BOARD_WIDTH || y >= BOARD_HEIGHT || !board_distributed)
+    {
+        return;
+    }
+
+    if (get_cell_type(x, y) == ECell_Hidden)
+    {
+        board_status[XY_TO_INDEX(x, y)] = ECell_Flag;
+    }
+    else if (get_cell_type(x, y) == ECell_Flag)
+    {
+        board_status[XY_TO_INDEX(x, y)] = ECell_Hidden;
+    }
+}

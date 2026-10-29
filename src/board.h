@@ -26,6 +26,9 @@ ECell_t get_cell_type(uint8_t x, uint8_t y);
 void press_on_cell(uint8_t x, uint8_t y);
 void board_full_reveal();
 void board_partial_reveal(uint8_t x, uint8_t y);
+
+void flag_on_cell(uint8_t x, uint8_t y);
+
 bool has_won();
 
 

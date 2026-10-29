@@ -13,6 +13,7 @@ static gamepad_player_t p1;
 typedef struct
 {
     bool previous_space_bar_pressed;
+    bool previous_alternate_pressed;
     bool previous_left_pressed;
 } keyboard_previous_t;
 
@@ -53,6 +54,10 @@ const actions_t *input_action_update()
     actions.just_pressed_action = space_bar_pressed && !keyboard_previous.previous_space_bar_pressed;
     keyboard_previous.previous_space_bar_pressed = space_bar_pressed;
 
+    const bool alternate_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_X);
+    actions.just_pressed_alternate = alternate_pressed && !keyboard_previous.previous_alternate_pressed;
+    keyboard_previous.previous_alternate_pressed = alternate_pressed;
+
     const bool left_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_ARROW_LEFT);
     actions.just_pressed_left = left_pressed && !keyboard_previous.previous_left_pressed;
     keyboard_previous.previous_left_pressed = left_pressed;
@@ -78,6 +83,7 @@ const actions_t *input_action_update()
 
     const uint8_t old_tablet_status = actions.tablet_status;
     actions.just_pressed_action |= (tab.contact.flags & TABLET_FLAG_LEFT) && !(old_tablet_status & TABLET_FLAG_LEFT);
+    actions.just_pressed_alternate |= (tab.contact.flags & TABLET_FLAG_RIGHT) && !(old_tablet_status & TABLET_FLAG_RIGHT);
     actions.tablet_status = tab.contact.flags;
 
     // Gamepad
