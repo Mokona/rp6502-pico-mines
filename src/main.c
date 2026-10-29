@@ -9,6 +9,30 @@
 #define BOARD_DISPLAY_X 5
 #define BOARD_DISPLAY_Y 3
 
+#define COUNTER_FACE_X BOARD_DISPLAY_X
+
+static void draw_happy_face()
+{
+    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_HAPPY);
+}
+
+static void draw_sad_face()
+{
+    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_SAD);
+}
+
+static void draw_ui()
+{
+    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_TIME);
+    display_tile_at(COUNTER_FACE_X + 1, BOARD_DISPLAY_Y - 2, NUMBER_0);
+    display_tile_at(COUNTER_FACE_X + 2, BOARD_DISPLAY_Y - 2, NUMBER_0);
+    display_tile_at(COUNTER_FACE_X + 3, BOARD_DISPLAY_Y - 2, NUMBER_0);
+
+    display_tile_at(BOARD_DISPLAY_X + 7, BOARD_DISPLAY_Y - 2, UI_FLAG);
+    display_tile_at(BOARD_DISPLAY_X + 8, BOARD_DISPLAY_Y - 2, NUMBER_0);
+    display_tile_at(BOARD_DISPLAY_X + 9, BOARD_DISPLAY_Y - 2, NUMBER_0);
+}
+
 static void draw_board_borders()
 {
     const uint8_t h = get_board_height();
@@ -83,6 +107,7 @@ int main(void)
 
     draw_board();
     draw_board_borders();
+    draw_ui();
 
     uint8_t old_hover_x = 0;
     uint8_t old_hover_y = 0;
@@ -136,7 +161,6 @@ int main(void)
 
         if (actions->just_pressed_action)
         {
-            // printf("Press Cell %u %u\n", old_hover_x, old_hover_y);
             press_on_cell(old_hover_x, old_hover_y);
             draw_board(); // TODO: optimize by displaying only the changed cell
 
@@ -146,6 +170,7 @@ int main(void)
                 // Game over
                 board_full_reveal();
                 draw_board();
+                draw_sad_face();
             }
             else
             {
@@ -155,7 +180,7 @@ int main(void)
 
             if (has_won())
             {
-                puts("WON");
+                draw_happy_face();
             }
         }
     }
