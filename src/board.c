@@ -106,7 +106,14 @@ static void distribute_mines(uint8_t x, uint8_t y)
             continue;
         }
 
-        board_content[XY_TO_INDEX(mine_x, mine_y)] = CELL_MINE_MARKER;
+        const uint8_t index = XY_TO_INDEX(mine_x, mine_y);
+
+        if (board_content[index] == CELL_MINE_MARKER)
+        {
+            continue;
+        }
+
+        board_content[index] = CELL_MINE_MARKER;
         mine_count -= 1;
     }
     board_distributed = true;
