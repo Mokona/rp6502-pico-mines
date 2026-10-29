@@ -14,6 +14,7 @@
 static bool board_distributed;
 static uint8_t board_content[BOARD_WIDTH * BOARD_HEIGHT];
 static ECell_t board_status[BOARD_WIDTH * BOARD_HEIGHT];
+static uint8_t uncovered_count;
 
 #define XY_TO_INDEX(x, y) ((x) + (y) * BOARD_WIDTH)
 
@@ -22,6 +23,7 @@ void board_init()
     memset(board_content, 0, sizeof(board_content));
     memset(board_status, ECell_Hidden, sizeof(board_status));
     board_distributed = false;
+    uncovered_count = 0;
 }
 
 uint8_t get_board_width()
@@ -42,6 +44,11 @@ uint8_t get_cell_content(uint8_t x, uint8_t y)
 ECell_t get_cell_type(uint8_t x, uint8_t y)
 {
     return board_status[XY_TO_INDEX(x, y)];
+}
+
+bool has_won()
+{
+    return uncovered_count + MINE_COUNT == BOARD_WIDTH * BOARD_HEIGHT;
 }
 
 static uint8_t compute_close_mine_count(uint8_t x, uint8_t y)
@@ -211,6 +218,8 @@ static void board_step_partial_reveal(uint8_t x, uint8_t y)
             if (board_status[index] == ECell_Hidden && board_content[index] != CELL_MINE_MARKER)
             {
                 board_status[index] = ECell_Uncovered;
+                uncovered_count += 1;
+
                 if (board_content[index] == 0)
                 {
                     add_to_queue(xdx, ydy);
@@ -261,5 +270,6 @@ void press_on_cell(uint8_t x, uint8_t y)
             new_status = ECell_Exploded;
         }
         board_status[XY_TO_INDEX(x, y)] = new_status;
+        uncovered_count += 1;
     }
 }

@@ -99,8 +99,6 @@ int main(void)
 
         if (actions->pointer_moved)
         {
-            // printf("x=%d y=%d\n", actions->pointer_x, actions->pointer_y);
-
             const int8_t tentative_hover_cell_x = (int8_t)(actions->pointer_x / 16 - BOARD_DISPLAY_X);
             const int8_t tentative_hover_cell_y = (int8_t)(actions->pointer_y / 16 - BOARD_DISPLAY_Y);
 
@@ -153,6 +151,11 @@ int main(void)
             {
                 board_partial_reveal(old_hover_x, old_hover_y);
                 draw_board();
+            }
+
+            if (has_won())
+            {
+                puts("WON");
             }
         }
     }

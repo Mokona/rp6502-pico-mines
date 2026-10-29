@@ -2,6 +2,7 @@
 #define MY_RP6502_PROJECT_BOARD_H
 
 #include <stdint.h>
+#include <stdbool.h>
 
 void board_init();
 
@@ -25,5 +26,7 @@ ECell_t get_cell_type(uint8_t x, uint8_t y);
 void press_on_cell(uint8_t x, uint8_t y);
 void board_full_reveal();
 void board_partial_reveal(uint8_t x, uint8_t y);
+bool has_won();
+
 
 #endif // MY_RP6502_PROJECT_BOARD_H
