@@ -5,33 +5,8 @@
 
 #include "board.h"
 #include "input_actions.h"
-
-#define BOARD_DISPLAY_X 5
-#define BOARD_DISPLAY_Y 3
-
-#define COUNTER_FACE_X BOARD_DISPLAY_X
-
-static void draw_happy_face()
-{
-    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_HAPPY);
-}
-
-static void draw_sad_face()
-{
-    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_SAD);
-}
-
-static void draw_ui()
-{
-    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_TIME);
-    display_tile_at(COUNTER_FACE_X + 1, BOARD_DISPLAY_Y - 2, NUMBER_0);
-    display_tile_at(COUNTER_FACE_X + 2, BOARD_DISPLAY_Y - 2, NUMBER_0);
-    display_tile_at(COUNTER_FACE_X + 3, BOARD_DISPLAY_Y - 2, NUMBER_0);
-
-    display_tile_at(BOARD_DISPLAY_X + 7, BOARD_DISPLAY_Y - 2, UI_FLAG);
-    display_tile_at(BOARD_DISPLAY_X + 8, BOARD_DISPLAY_Y - 2, NUMBER_0);
-    display_tile_at(BOARD_DISPLAY_X + 9, BOARD_DISPLAY_Y - 2, NUMBER_0);
-}
+#include "game_config.h"
+#include "ui.h"
 
 static void draw_board_borders()
 {
