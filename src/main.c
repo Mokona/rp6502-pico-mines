@@ -271,12 +271,28 @@ int main(void)
         }
         else
         {
-            const bool face = is_hovering_face(actions->pointer_x, actions->pointer_y);
+            const uint16_t pointer_x = actions->pointer_x;
+            const uint16_t pointer_y = actions->pointer_y;
 
             // const  bool setting = is_hovering_gear(actions->pointer_x, actions->pointer_y);
+
+            if (actions->just_pressed_action && is_hovering_face(pointer_x, pointer_y))
+            {
+                game_running = true;
+            }
             if (actions->just_pressed_start)
             {
                 game_running = true;
+            }
+
+            if (game_running)
+            {
+                puts("Let's go!");
+                draw_timer();
+                draw_time(0);
+
+                board_init();
+                draw_board();
             }
         }
     }

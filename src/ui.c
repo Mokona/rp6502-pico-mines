@@ -32,7 +32,17 @@ void draw_happy_face()
 
 void draw_sad_face()
 {
-    display_tile_at(FACE_CELL_X, FACE_CELL_Y - 2, UI_SAD);
+    display_tile_at(FACE_CELL_X, FACE_CELL_Y, UI_SAD);
+}
+
+void draw_timer()
+{
+    display_tile_at(FACE_CELL_X, FACE_CELL_Y, UI_TIME);
+}
+
+void draw_time(uint16_t time)
+{
+    display_number_at(FACE_CELL_X + 1, FACE_CELL_Y, time, 3);
 }
 
 void draw_flags(uint8_t count)
@@ -42,8 +52,8 @@ void draw_flags(uint8_t count)
 
 void draw_ui()
 {
-    display_tile_at(FACE_CELL_X, FACE_CELL_Y, UI_TIME);
-    display_number_at(FACE_CELL_X + 1, FACE_CELL_Y, 999, 3);
+    draw_happy_face();
+    draw_time(999);
 
     display_tile_at(GEAR_CELL_X, GEAR_CELL_Y, UI_GEAR);
     display_number_at(GEAR_CELL_X + 1, GEAR_CELL_Y, 1, 1);
@@ -57,8 +67,6 @@ bool is_hovering_gear(uint16_t x, uint16_t y)
     const uint8_t cell_x = (x / 16) - GEAR_CELL_X;
     const uint8_t cell_y = (y / 16) - GEAR_CELL_Y;
 
-    printf("%u %u\n", cell_x, cell_y);
-
     return cell_x == 0 && cell_y == 0;
 }
 
@@ -66,8 +74,6 @@ bool is_hovering_face(uint16_t x, uint16_t y)
 {
     const uint8_t cell_x = (x / 16) - FACE_CELL_X;
     const uint8_t cell_y = (y / 16) - FACE_CELL_Y;
-
-    printf("%u %u\n", cell_x, cell_y);
 
     return cell_x == 0 && cell_y == 0;
 }
