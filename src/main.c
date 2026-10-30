@@ -320,7 +320,6 @@ int main(void)
 
             if (game_running)
             {
-                puts("Let's go!");
                 draw_timer();
                 draw_time(0);
 

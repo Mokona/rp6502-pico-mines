@@ -108,8 +108,6 @@ static void distribute_mines(uint8_t x, uint8_t y, uint8_t mine_count)
 {
     game_mine_count = mine_count;
 
-    printf("M: %u\n", game_mine_count);
-
     srand(time(NULL));
 
     while (mine_count > 0)
@@ -276,7 +274,6 @@ void press_on_cell(uint8_t x, uint8_t y)
 
     if (!board_distributed)
     {
-        printf("L: %u\n", game_level);
         distribute_mines(x, y, get_mines_for_level(game_level));
         compute_hints();
     }
@@ -319,12 +316,10 @@ uint8_t get_flag_count()
 
 uint8_t get_game_mine_count()
 {
-    printf("%u\n", game_mine_count);
     return game_mine_count;
 }
 
 void set_game_level(uint8_t level)
 {
-    printf("New Level: %u\n", level);
     game_level = level;
 }
