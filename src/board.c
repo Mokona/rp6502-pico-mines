@@ -160,8 +160,6 @@ static bool queue_has(uint8_t x, uint8_t y)
     return false;
 }
 
-#define max(x, y) (x > y ? x : y)
-
 static void add_to_queue(uint8_t x, uint8_t y)
 {
     if (queue_has(x, y) || reveal_queue_index == MAX_REVEAL_QUEUE)

@@ -4,7 +4,13 @@
 #include "game_config.h"
 #include "generated/tile_atlas.h"
 
-#define COUNTER_FACE_X (BOARD_DISPLAY_X - 1)
+#include <stdio.h>
+
+#define FACE_CELL_X (BOARD_DISPLAY_X - 1)
+#define FACE_CELL_Y (BOARD_DISPLAY_Y - 2)
+
+#define GEAR_CELL_X (FACE_CELL_X + 6)
+#define GEAR_CELL_Y (FACE_CELL_Y)
 
 static void display_number_at(uint8_t x, uint8_t y, uint16_t number, uint8_t width)
 {
@@ -21,27 +27,47 @@ static void display_number_at(uint8_t x, uint8_t y, uint16_t number, uint8_t wid
 
 void draw_happy_face()
 {
-    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_HAPPY);
+    display_tile_at(FACE_CELL_X, FACE_CELL_Y, UI_HAPPY);
 }
 
 void draw_sad_face()
 {
-    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_SAD);
+    display_tile_at(FACE_CELL_X, FACE_CELL_Y - 2, UI_SAD);
 }
 
 void draw_flags(uint8_t count)
 {
-    display_number_at(COUNTER_FACE_X + 10, BOARD_DISPLAY_Y - 2, count, 2);
+    display_number_at(FACE_CELL_X + 10, FACE_CELL_Y, count, 2);
 }
 
 void draw_ui()
 {
-    display_tile_at(COUNTER_FACE_X, BOARD_DISPLAY_Y - 2, UI_TIME);
-    display_number_at(COUNTER_FACE_X + 1, BOARD_DISPLAY_Y - 2, 999, 3);
+    display_tile_at(FACE_CELL_X, FACE_CELL_Y, UI_TIME);
+    display_number_at(FACE_CELL_X + 1, FACE_CELL_Y, 999, 3);
 
-    display_tile_at(COUNTER_FACE_X + 6, BOARD_DISPLAY_Y - 2, UI_GEAR);
-    display_number_at(COUNTER_FACE_X + 7, BOARD_DISPLAY_Y - 2, 1, 1);
+    display_tile_at(GEAR_CELL_X, GEAR_CELL_Y, UI_GEAR);
+    display_number_at(GEAR_CELL_X + 1, GEAR_CELL_Y, 1, 1);
 
-    display_tile_at(COUNTER_FACE_X + 9, BOARD_DISPLAY_Y - 2, UI_FLAG);
+    display_tile_at(FACE_CELL_X + 9, FACE_CELL_Y, UI_FLAG);
     draw_flags(10);
+}
+
+bool is_hovering_gear(uint16_t x, uint16_t y)
+{
+    const uint8_t cell_x = (x / 16) - GEAR_CELL_X;
+    const uint8_t cell_y = (y / 16) - GEAR_CELL_Y;
+
+    printf("%u %u\n", cell_x, cell_y);
+
+    return cell_x == 0 && cell_y == 0;
+}
+
+bool is_hovering_face(uint16_t x, uint16_t y)
+{
+    const uint8_t cell_x = (x / 16) - FACE_CELL_X;
+    const uint8_t cell_y = (y / 16) - FACE_CELL_Y;
+
+    printf("%u %u\n", cell_x, cell_y);
+
+    return cell_x == 0 && cell_y == 0;
 }

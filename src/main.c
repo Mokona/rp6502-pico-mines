@@ -1,12 +1,12 @@
-#include "display.h"
-#include "xram.h"
 #include <rp6502.h>
 #include <stdio.h>
 
 #include "board.h"
+#include "display.h"
 #include "game_config.h"
 #include "input_actions.h"
 #include "ui.h"
+#include "xram.h"
 
 #define BLINK_TIME 20
 
@@ -84,7 +84,7 @@ static void draw_board()
 
 static void draw_cell_blink(uint8_t x, uint8_t y, bool blink)
 {
-    if (x != 0xff && y != 0xff)
+    if (x != 0xff && y != 0xff && x < get_board_width() && y < get_board_height())
     {
         if (blink)
         {
@@ -93,6 +93,144 @@ static void draw_cell_blink(uint8_t x, uint8_t y, bool blink)
         else
         {
             draw_cell(x, y);
+        }
+    }
+}
+
+static uint8_t old_hover_x;
+static uint8_t old_hover_y;
+
+static void main_game_update(bool *game_running, const actions_t *actions)
+{
+    if (actions->pointer_moved)
+    {
+        const int8_t tentative_hover_cell_x = (int8_t)(actions->pointer_x / 16 - BOARD_DISPLAY_X);
+        const int8_t tentative_hover_cell_y = (int8_t)(actions->pointer_y / 16 - BOARD_DISPLAY_Y);
+
+        if ((tentative_hover_cell_x >= 0 && tentative_hover_cell_x < get_board_width()) &&
+            (tentative_hover_cell_y >= 0 && tentative_hover_cell_y < get_board_height()))
+        {
+            const uint8_t hover_cell_x = tentative_hover_cell_x;
+            const uint8_t hover_cell_y = tentative_hover_cell_y;
+
+            if (hover_cell_x != old_hover_x || hover_cell_y != old_hover_y)
+            {
+                draw_cell_blink(old_hover_x, old_hover_y, false);
+                hover_blink_on = true;
+                hover_blink_time = BLINK_TIME;
+
+                old_hover_x = hover_cell_x;
+                old_hover_y = hover_cell_y;
+            }
+        }
+        else
+        {
+            draw_cell_blink(old_hover_x, old_hover_y, false);
+
+            old_hover_x = 0xff;
+            old_hover_y = 0xff;
+        }
+
+#ifdef CURSOR_AS_SPRITE
+        sprite_config.x_pos_px = actions->pointer_x;
+        sprite_config.y_pos_px = actions->pointer_y;
+        xram0_write(XRAM_SPRITE_CONFIG + 0 * sizeof(mode5_sprite_t), &sprite_config, sizeof(mode5_sprite_t));
+#endif
+    }
+
+    // TODO: simplify the duplicated code
+    if (actions->just_pressed_left)
+    {
+        draw_cell_blink(old_hover_x, old_hover_y, false);
+        hover_blink_on = true;
+        hover_blink_time = BLINK_TIME;
+
+        if (old_hover_x > 0)
+        {
+            old_hover_x -= 1;
+        }
+    }
+
+    if (actions->just_pressed_right)
+    {
+        draw_cell_blink(old_hover_x, old_hover_y, false);
+        hover_blink_on = true;
+        hover_blink_time = BLINK_TIME;
+
+        if (old_hover_x < get_board_width() - 1)
+        {
+            old_hover_x += 1;
+        }
+    }
+
+    if (actions->just_pressed_up)
+    {
+        draw_cell_blink(old_hover_x, old_hover_y, false);
+        hover_blink_on = true;
+        hover_blink_time = BLINK_TIME;
+
+        if (old_hover_y > 0)
+        {
+            old_hover_y -= 1;
+        }
+    }
+
+    if (actions->just_pressed_down)
+    {
+        draw_cell_blink(old_hover_x, old_hover_y, false);
+        hover_blink_on = true;
+        hover_blink_time = BLINK_TIME;
+
+        if (old_hover_y < get_board_height() - 1)
+        {
+            old_hover_y += 1;
+        }
+    }
+
+    if (actions->just_pressed_action)
+    {
+        press_on_cell(old_hover_x, old_hover_y);
+        draw_board(); // TODO: optimize by displaying only the changed cell
+
+        const ECell_t cell = get_cell_type(old_hover_x, old_hover_y);
+        if (cell == ECell_Exploded)
+        {
+            // Game over
+            board_full_reveal();
+            draw_board();
+            draw_sad_face();
+            *game_running = false;
+        }
+        else
+        {
+            board_partial_reveal(old_hover_x, old_hover_y);
+            draw_board();
+        }
+
+        if (has_won())
+        {
+            draw_happy_face();
+            *game_running = false;
+        }
+    }
+    else if (actions->just_pressed_alternate)
+    {
+        flag_on_cell(old_hover_x, old_hover_y);
+        draw_board(); // TODO: optimize by displaying only the changed cell
+
+        const int8_t left_mines = MINE_COUNT - get_flag_count();
+        draw_flags(max(left_mines, 0));
+    }
+
+    if (*game_running)
+    {
+        draw_cell_blink(old_hover_x, old_hover_y, hover_blink_on);
+
+        hover_blink_time -= 1;
+        if (hover_blink_time == 0)
+        {
+            hover_blink_time = BLINK_TIME;
+            hover_blink_on = !hover_blink_on;
         }
     }
 }
@@ -112,10 +250,10 @@ int main(void)
     hover_blink_on = false;
     hover_blink_time = BLINK_TIME;
 
-    uint8_t old_hover_x = get_board_width() / 2;
-    uint8_t old_hover_y = get_board_height() / 2;
+    old_hover_x = get_board_width() / 2;
+    old_hover_y = get_board_height() / 2;
 
-    bool game_running = true;
+    bool game_running = false;
 
     while (true)
     {
@@ -127,133 +265,18 @@ int main(void)
         //
         const actions_t *actions = input_action_update();
 
-        if (actions->pointer_moved)
-        {
-            const int8_t tentative_hover_cell_x = (int8_t)(actions->pointer_x / 16 - BOARD_DISPLAY_X);
-            const int8_t tentative_hover_cell_y = (int8_t)(actions->pointer_y / 16 - BOARD_DISPLAY_Y);
-
-            if ((tentative_hover_cell_x >= 0 && tentative_hover_cell_x < get_board_width()) &&
-                (tentative_hover_cell_y >= 0 && tentative_hover_cell_y < get_board_height()))
-            {
-                const uint8_t hover_cell_x = tentative_hover_cell_x;
-                const uint8_t hover_cell_y = tentative_hover_cell_y;
-
-                if (hover_cell_x != old_hover_x || hover_cell_y != old_hover_y)
-                {
-                    draw_cell_blink(old_hover_x, old_hover_y, false);
-                    hover_blink_on = true;
-                    hover_blink_time = BLINK_TIME;
-
-                    old_hover_x = hover_cell_x;
-                    old_hover_y = hover_cell_y;
-                }
-            }
-            else
-            {
-                draw_cell_blink(old_hover_x, old_hover_y, false);
-
-                old_hover_x = 0xff;
-                old_hover_y = 0xff;
-            }
-
-#ifdef CURSOR_AS_SPRITE
-            sprite_config.x_pos_px = actions->pointer_x;
-            sprite_config.y_pos_px = actions->pointer_y;
-            xram0_write(XRAM_SPRITE_CONFIG + 0 * sizeof(mode5_sprite_t), &sprite_config, sizeof(mode5_sprite_t));
-#endif
-        }
-
-        // TODO: simplify the duplicated code
-        if (actions->just_pressed_left)
-        {
-            draw_cell_blink(old_hover_x, old_hover_y, false);
-            hover_blink_on = true;
-            hover_blink_time = BLINK_TIME;
-
-            if (old_hover_x > 0)
-            {
-                old_hover_x -= 1;
-            }
-        }
-
-        if (actions->just_pressed_right)
-        {
-            draw_cell_blink(old_hover_x, old_hover_y, false);
-            hover_blink_on = true;
-            hover_blink_time = BLINK_TIME;
-
-            if (old_hover_x < get_board_width() - 1)
-            {
-                old_hover_x += 1;
-            }
-        }
-
-        if (actions->just_pressed_up)
-        {
-            draw_cell_blink(old_hover_x, old_hover_y, false);
-            hover_blink_on = true;
-            hover_blink_time = BLINK_TIME;
-
-            if (old_hover_y > 0)
-            {
-                old_hover_y -= 1;
-            }
-        }
-
-        if (actions->just_pressed_down)
-        {
-            draw_cell_blink(old_hover_x, old_hover_y, false);
-            hover_blink_on = true;
-            hover_blink_time = BLINK_TIME;
-
-            if (old_hover_y < get_board_height() - 1)
-            {
-                old_hover_y += 1;
-            }
-        }
-
-        if (actions->just_pressed_action)
-        {
-            press_on_cell(old_hover_x, old_hover_y);
-            draw_board(); // TODO: optimize by displaying only the changed cell
-
-            const ECell_t cell = get_cell_type(old_hover_x, old_hover_y);
-            if (cell == ECell_Exploded)
-            {
-                // Game over
-                board_full_reveal();
-                draw_board();
-                draw_sad_face();
-                game_running = false;
-            }
-            else
-            {
-                board_partial_reveal(old_hover_x, old_hover_y);
-                draw_board();
-            }
-
-            if (has_won())
-            {
-                draw_happy_face();
-                game_running = false;
-            }
-        }
-        else if (actions->just_pressed_alternate)
-        {
-            flag_on_cell(old_hover_x, old_hover_y);
-            draw_board(); // TODO: optimize by displaying only the changed cell
-            draw_flags(MINE_COUNT - get_flag_count());
-        }
-
         if (game_running)
         {
-            draw_cell_blink(old_hover_x, old_hover_y, hover_blink_on);
+            main_game_update(&game_running, actions);
+        }
+        else
+        {
+            const bool face = is_hovering_face(actions->pointer_x, actions->pointer_y);
 
-            hover_blink_time -= 1;
-            if (hover_blink_time == 0)
+            // const  bool setting = is_hovering_gear(actions->pointer_x, actions->pointer_y);
+            if (actions->just_pressed_start)
             {
-                hover_blink_time = BLINK_TIME;
-                hover_blink_on = !hover_blink_on;
+                game_running = true;
             }
         }
     }

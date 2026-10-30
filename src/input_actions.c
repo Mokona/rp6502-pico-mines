@@ -18,6 +18,7 @@ typedef struct
     bool previous_right_pressed;
     bool previous_up_pressed;
     bool previous_down_pressed;
+    bool previous_start_pressed;
 } keyboard_previous_t;
 
 static keyboard_previous_t keyboard_previous;
@@ -60,6 +61,10 @@ const actions_t *input_action_update()
     const bool alternate_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_X);
     actions.just_pressed_alternate = alternate_pressed && !keyboard_previous.previous_alternate_pressed;
     keyboard_previous.previous_alternate_pressed = alternate_pressed;
+
+    const bool start_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_ENTER);
+    actions.just_pressed_start = start_pressed && !keyboard_previous.previous_start_pressed;
+    keyboard_previous.previous_start_pressed = start_pressed;
 
     const bool left_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_ARROW_LEFT);
     actions.just_pressed_left = left_pressed && !keyboard_previous.previous_left_pressed;
