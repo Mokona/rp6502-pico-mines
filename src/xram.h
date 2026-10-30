@@ -256,6 +256,43 @@ typedef struct
 //     uint8_t attributes;
 // } mode5_csprite_t; /* layout */
 
+// AUDIO
+
+#define PSG_CHANNELS 8
+
+#define PSG_WAVE_SINE 0x00
+#define PSG_WAVE_SQUARE 0x10
+#define PSG_WAVE_SAWTOOTH 0x20
+#define PSG_WAVE_TRIANGLE 0x30
+#define PSG_WAVE_NOISE 0x40
+
+#define PSG_GATE 0x01
+
+#define PSG_FREQ_HZ(hz) ((hz) * 3u)
+#define PSG_PAN(pan) ((uint8_t)((pan) * 2))
+
+#define xreg_ria_psg(...) xreg(0x0, 0x1, 0x00, __VA_ARGS__)
+
+typedef struct
+{
+    uint16_t freq;
+    uint8_t duty;
+    uint8_t attack;
+    uint8_t decay;
+    uint8_t release_wave;
+    uint8_t pan_gate;
+    uint8_t reserved;
+} psg_channel_t;
+
+typedef struct
+{
+    psg_channel_t channel[PSG_CHANNELS];
+} psg_t; /* layout */
+
+/* After the XRAM_ names: PSG_PAGE_CHECK(XRAM_PSG); */
+#define PSG_PAGE_CHECK(addr) \
+    _Static_assert((addr) % 256 + sizeof(psg_t) <= 256, #addr " crosses a page.")
+
 
 // XRAM LAYOUT
 #define WIDTH_IN_TILES 20
@@ -266,6 +303,7 @@ typedef struct
 
 typedef struct
 {
+    psg_t psg;
     keyboard_t keyboard;
     tablet_t tablet;
     gamepad_player_t gamepad[GAMEPAD_PLAYERS];
@@ -285,5 +323,9 @@ typedef struct
 #define XRAM_TILES offsetof(xram_layout_t, tiles)
 #define XRAM_SPRITE_CONFIG offsetof(xram_layout_t, sprite_config)
 #define XRAM_SPRITES offsetof(xram_layout_t, sprites)
+#define XRAM_PSG offsetof(xram_layout_t, psg)
+
+
+PSG_PAGE_CHECK(XRAM_PSG);
 
 #endif

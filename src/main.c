@@ -1,3 +1,5 @@
+#include "audio.h"
+
 #include <rp6502.h>
 #include <stdio.h>
 
@@ -105,7 +107,6 @@ static void draw_cell_blink(uint8_t x, uint8_t y, bool blink)
 static uint8_t old_hover_x;
 static uint8_t old_hover_y;
 
-
 static void main_game_update(bool *game_running, const actions_t *actions)
 {
     if (actions->pointer_moved)
@@ -195,6 +196,7 @@ static void main_game_update(bool *game_running, const actions_t *actions)
 
     if (actions->just_pressed_action)
     {
+        play_press();
         press_on_cell(old_hover_x, old_hover_y);
         draw_board(); // TODO: optimize by displaying only the changed cell
 
@@ -262,6 +264,7 @@ int main(void)
 
     display_init();
     input_action_init();
+    audio_init();
     board_init();
 
     draw_board();
@@ -284,6 +287,8 @@ int main(void)
         const unsigned char frame = ria_vsync();
         while (ria_vsync() == frame)
             ;
+
+        audio_update();
 
         //
         const actions_t *actions = input_action_update();

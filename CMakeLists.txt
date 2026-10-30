@@ -29,6 +29,8 @@ else ()
             src/board.h
             src/ui.c
             src/ui.h
+            src/audio.c
+            src/audio.h
             src/game_config.h
     )
 endif ()
