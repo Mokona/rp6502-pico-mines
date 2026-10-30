@@ -18,6 +18,7 @@ typedef struct
     bool just_pressed_start;
     bool just_pressed_select;
     uint8_t dpad;
+    uint8_t btn0;
     uint8_t btn1;
     uint8_t tablet_status;
 } actions_t;
