@@ -142,11 +142,16 @@ void board_full_reveal()
     }
 }
 
-#define MAX_REVEAL_QUEUE 15
+#define MAX_REVEAL_QUEUE 20
 static uint8_t reveal_queue_x[MAX_REVEAL_QUEUE];
 static uint8_t reveal_queue_y[MAX_REVEAL_QUEUE];
 static uint8_t reveal_queue_index;
+
+// #define COMPUTE_MAX_QUEUE
+
+#if defined(COMPUTE_MAX_QUEUE)
 static uint8_t max_queue_index;
+#endif
 
 static bool queue_has(uint8_t x, uint8_t y)
 {
@@ -170,7 +175,9 @@ static void add_to_queue(uint8_t x, uint8_t y)
     reveal_queue_y[reveal_queue_index] = y;
     reveal_queue_index += 1;
 
+#if defined(COMPUTE_MAX_QUEUE)
     max_queue_index = max(max_queue_index, reveal_queue_index);
+#endif
 }
 
 static uint8_t front_x()
@@ -233,7 +240,9 @@ void board_partial_reveal(uint8_t x, uint8_t y)
         return;
     }
     reveal_queue_index = 0;
+#if defined(COMPUTE_MAX_QUEUE)
     max_queue_index = 0;
+#endif
     add_to_queue(x, y);
     while (has_queue_element())
     {
@@ -243,7 +252,9 @@ void board_partial_reveal(uint8_t x, uint8_t y)
 
         board_step_partial_reveal(fx, fy);
     }
+#if defined(COMPUTE_MAX_QUEUE)
     printf("Max queue: %u\n", max_queue_index);
+#endif
 }
 
 void press_on_cell(uint8_t x, uint8_t y)
