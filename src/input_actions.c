@@ -113,12 +113,21 @@ const actions_t *input_action_update()
 
     // Gamepad
     const uint8_t old_dpad = actions.dpad;
+    const uint8_t old_btn1 = actions.btn1;
     xram0_read(&p1, XRAM_GAMEPAD, sizeof(p1));
     if (p1.dpad & GAMEPAD_FEAT_CONNECTED)
     {
+        actions.just_pressed_start |= (p1.btn1 & GAMEPAD_BTN1_START) && !(old_btn1 & GAMEPAD_BTN1_START);
         actions.just_pressed_left |= (p1.dpad & GAMEPAD_DPAD_LEFT) && !(old_dpad & GAMEPAD_DPAD_LEFT);
-        actions.just_pressed_action |= (p1.dpad & GAMEPAD_BTN0_A) && !(old_dpad & GAMEPAD_BTN0_A);
+        actions.just_pressed_right |= (p1.dpad & GAMEPAD_DPAD_RIGHT) && !(old_dpad & GAMEPAD_DPAD_RIGHT);
+        actions.just_pressed_up |= (p1.dpad & GAMEPAD_DPAD_UP) && !(old_dpad & GAMEPAD_DPAD_UP);
+        actions.just_pressed_down |= (p1.dpad & GAMEPAD_DPAD_DOWN) && !(old_dpad & GAMEPAD_DPAD_DOWN);
+
+        //actions.just_pressed_action |= (p1.dpad & GAMEPAD_BTN0_A) && !(old_dpad & GAMEPAD_BTN0_A);
     }
+
+    actions.dpad = p1.dpad;
+    actions.btn1 = p1.btn1;
 
     return &actions;
 }
