@@ -13,8 +13,10 @@
 static bool hover_blink_on;
 static uint8_t hover_blink_time;
 
-static uint8_t time_counter = 0;
-static int16_t game_time = 0;
+static uint8_t time_counter;
+static int16_t game_time;
+
+static uint8_t current_level;
 
 static void draw_board_borders()
 {
@@ -230,7 +232,7 @@ static void main_game_update(bool *game_running, const actions_t *actions)
     {
         time_counter = 0;
         if (game_time < 999)
-{
+        {
             game_time += 1;
         }
         draw_time(game_time);
@@ -264,6 +266,8 @@ int main(void)
     hover_blink_on = false;
     hover_blink_time = BLINK_TIME;
 
+    current_level = 1;
+
     old_hover_x = get_board_width() / 2;
     old_hover_y = get_board_height() / 2;
 
@@ -290,13 +294,22 @@ int main(void)
 
             // const  bool setting = is_hovering_gear(actions->pointer_x, actions->pointer_y);
 
-            if (actions->just_pressed_action && is_hovering_face(pointer_x, pointer_y))
+            if (actions->just_pressed_action && is_hovering_face(pointer_x, pointer_y) || //
+                actions->just_pressed_start)
             {
                 game_running = true;
             }
-            if (actions->just_pressed_start)
+
+            if (actions->just_pressed_action && is_hovering_gear(pointer_x, pointer_y) || //
+                actions->just_pressed_select)
             {
-                game_running = true;
+                current_level += 1;
+                if (current_level > MAX_LEVELS)
+                {
+                    current_level = 1;
+                }
+                draw_level(current_level);
+                draw_flags(get_mines_for_level(current_level));
             }
 
             if (game_running)

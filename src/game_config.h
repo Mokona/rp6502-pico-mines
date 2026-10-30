@@ -11,4 +11,6 @@
 // TODO: move to a better place
 #define max(x, y) (x > y ? x : y)
 
+#define MAX_LEVELS 3
+
 #endif

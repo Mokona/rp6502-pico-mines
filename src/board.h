@@ -32,5 +32,7 @@ uint8_t get_flag_count();
 
 bool has_won();
 
+uint8_t get_mines_for_level(uint8_t level);
+
 
 #endif // MY_RP6502_PROJECT_BOARD_H

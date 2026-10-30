@@ -4,8 +4,6 @@
 #include "game_config.h"
 #include "generated/tile_atlas.h"
 
-#include <stdio.h>
-
 #define FACE_CELL_X (BOARD_DISPLAY_X - 1)
 #define FACE_CELL_Y (BOARD_DISPLAY_Y - 2)
 
@@ -45,6 +43,11 @@ void draw_time(uint16_t time)
     display_number_at(FACE_CELL_X + 1, FACE_CELL_Y, time, 3);
 }
 
+void draw_level(uint16_t level)
+{
+    display_number_at(GEAR_CELL_X + 1, GEAR_CELL_Y, level, 1);
+}
+
 void draw_flags(uint8_t count)
 {
     display_number_at(FACE_CELL_X + 10, FACE_CELL_Y, count, 2);
@@ -56,10 +59,10 @@ void draw_ui()
     draw_time(999);
 
     display_tile_at(GEAR_CELL_X, GEAR_CELL_Y, UI_GEAR);
-    display_number_at(GEAR_CELL_X + 1, GEAR_CELL_Y, 1, 1);
+    draw_level(1);
 
     display_tile_at(FACE_CELL_X + 9, FACE_CELL_Y, UI_FLAG);
-    draw_flags(10);
+    draw_flags(12);
 }
 
 bool is_hovering_gear(uint16_t x, uint16_t y)

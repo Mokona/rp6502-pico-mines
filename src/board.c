@@ -50,6 +50,11 @@ bool has_won()
     return uncovered_count + MINE_COUNT == BOARD_WIDTH * BOARD_HEIGHT;
 }
 
+uint8_t get_mines_for_level(uint8_t level)
+{
+    return 8 + 4 * level;
+}
+
 static uint8_t compute_close_mine_count(uint8_t x, uint8_t y)
 {
     uint8_t mine_count = 0;

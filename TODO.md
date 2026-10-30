@@ -1,7 +1,6 @@
 ## Gameplay
 
-- Timer increment (blocked at 999)
-- Change of level by pressing the gear (3 levels, changing mine number only)
+- Implement new game with current number of mines
 - With keyboard, level is changed by Shift
 - With gamepad, level is changed by Select
 - When game not started, flags display the mines for the game
