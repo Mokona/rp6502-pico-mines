@@ -105,6 +105,7 @@ static void draw_cell_blink(uint8_t x, uint8_t y, bool blink)
 static uint8_t old_hover_x;
 static uint8_t old_hover_y;
 
+
 static void main_game_update(bool *game_running, const actions_t *actions)
 {
     if (actions->pointer_moved)
@@ -223,7 +224,7 @@ static void main_game_update(bool *game_running, const actions_t *actions)
         flag_on_cell(old_hover_x, old_hover_y);
         draw_board(); // TODO: optimize by displaying only the changed cell
 
-        const int8_t left_mines = MINE_COUNT - get_flag_count();
+        const int8_t left_mines = get_game_mine_count() - get_flag_count();
         draw_flags(max(left_mines, 0));
     }
 
@@ -248,6 +249,10 @@ static void main_game_update(bool *game_running, const actions_t *actions)
             hover_blink_time = BLINK_TIME;
             hover_blink_on = !hover_blink_on;
         }
+    }
+    else
+    {
+        draw_flags(get_mines_for_level(current_level));
     }
 }
 
@@ -310,6 +315,7 @@ int main(void)
                 }
                 draw_level(current_level);
                 draw_flags(get_mines_for_level(current_level));
+                set_game_level(current_level);
             }
 
             if (game_running)

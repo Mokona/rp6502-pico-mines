@@ -30,6 +30,9 @@ void board_partial_reveal(uint8_t x, uint8_t y);
 void flag_on_cell(uint8_t x, uint8_t y);
 uint8_t get_flag_count();
 
+void set_game_level(uint8_t level);
+uint8_t get_game_mine_count();
+
 bool has_won();
 
 uint8_t get_mines_for_level(uint8_t level);
