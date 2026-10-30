@@ -4,9 +4,14 @@
 #include <stdio.h>
 
 #include "board.h"
-#include "input_actions.h"
 #include "game_config.h"
+#include "input_actions.h"
 #include "ui.h"
+
+#define BLINK_TIME 20
+
+static bool hover_blink_on;
+static uint8_t hover_blink_time;
 
 static void draw_board_borders()
 {
@@ -30,6 +35,39 @@ static void draw_board_borders()
     display_tile_at(BOARD_DISPLAY_X - 1, BOARD_DISPLAY_Y + h, BORDER_DL);
 }
 
+static void draw_cell(int x, int y)
+{
+    const ECell_t cell = get_cell_type(x, y);
+    uint8_t tile_index = UI_SAD; // in case of program error, a sad face will be displayed
+    switch (cell)
+    {
+    case ECell_Hidden:
+        tile_index = CELL_HIDDEN;
+        break;
+    case ECell_Flag:
+        tile_index = CELL_FLAG;
+        break;
+    case ECell_Uncovered:
+        tile_index = get_cell_content(x, y);
+        if (tile_index == CELL_MINE_MARKER)
+        {
+            tile_index = CELL_MINE;
+        }
+        else
+        {
+            tile_index += HINT_1 - 1;
+        }
+        break;
+    case ECell_Exploded:
+        tile_index = CELL_EXPLODE;
+        break;
+    default:
+        break;
+    }
+
+    display_tile_at(BOARD_DISPLAY_X + x, BOARD_DISPLAY_Y + y, tile_index);
+}
+
 static void draw_board()
 {
     const uint8_t h = get_board_height();
@@ -39,36 +77,20 @@ static void draw_board()
     {
         for (int x = 0; x < w; x++)
         {
-            ECell_t cell = get_cell_type(x, y);
-            uint8_t tile_index = UI_SAD; // in case of program error, a sad face will be displayed
-            switch (cell)
-            {
-            case ECell_Hidden:
-                tile_index = CELL_HIDDEN;
-                break;
-            case ECell_Flag:
-                tile_index = CELL_FLAG;
-                break;
-            case ECell_Uncovered:
-                tile_index = get_cell_content(x, y);
-                if (tile_index == CELL_MINE_MARKER)
-                {
-                    tile_index = CELL_MINE;
-                }
-                else
-                {
-                    tile_index += HINT_1 - 1;
-                }
-                break;
-            case ECell_Exploded:
-                tile_index = CELL_EXPLODE;
-                break;
-            default:
-                break;
-            }
-
-            display_tile_at(BOARD_DISPLAY_X + x, BOARD_DISPLAY_Y + y, tile_index);
+            draw_cell(x, y);
         }
+    }
+}
+
+static void draw_cell_blink(uint8_t x, uint8_t y, bool blink)
+{
+    if (blink)
+    {
+        display_tile_at(BOARD_DISPLAY_X + x, BOARD_DISPLAY_Y + y, BG__C);
+    }
+    else
+    {
+        draw_cell(x, y);
     }
 }
 
@@ -84,8 +106,13 @@ int main(void)
     draw_board_borders();
     draw_ui();
 
+    hover_blink_on = false;
+    hover_blink_time = BLINK_TIME;
+
     uint8_t old_hover_x = 0;
     uint8_t old_hover_y = 0;
+
+    bool game_running = true;
 
     while (true)
     {
@@ -102,6 +129,7 @@ int main(void)
             const int8_t tentative_hover_cell_x = (int8_t)(actions->pointer_x / 16 - BOARD_DISPLAY_X);
             const int8_t tentative_hover_cell_y = (int8_t)(actions->pointer_y / 16 - BOARD_DISPLAY_Y);
 
+
             if ((tentative_hover_cell_x >= 0 && tentative_hover_cell_x < get_board_width()) &&
                 (tentative_hover_cell_y >= 0 && tentative_hover_cell_y < get_board_height()))
             {
@@ -110,14 +138,25 @@ int main(void)
 
                 if (hover_cell_x != old_hover_x || hover_cell_y != old_hover_y)
                 {
-                    // printf("x=%d y=%d\n", hover_cell_x, hover_cell_y);
+                    if (old_hover_x != 0xff && old_hover_y != 0xff)
+                    {
+                        draw_cell_blink(old_hover_x, old_hover_y, false);
+                    }
 
                     old_hover_x = hover_cell_x;
                     old_hover_y = hover_cell_y;
+
+                    hover_blink_on = true;
+                    hover_blink_time = BLINK_TIME;
                 }
             }
             else
             {
+                if (old_hover_x != 0xff && old_hover_y != 0xff)
+                {
+                    draw_cell_blink(old_hover_x, old_hover_y, false);
+                }
+
                 old_hover_x = 0xff;
                 old_hover_y = 0xff;
             }
@@ -146,6 +185,7 @@ int main(void)
                 board_full_reveal();
                 draw_board();
                 draw_sad_face();
+                game_running = false;
             }
             else
             {
@@ -156,6 +196,7 @@ int main(void)
             if (has_won())
             {
                 draw_happy_face();
+                game_running = false;
             }
         }
         else if (actions->just_pressed_alternate)
@@ -163,6 +204,18 @@ int main(void)
             flag_on_cell(old_hover_x, old_hover_y);
             draw_board(); // TODO: optimize by displaying only the changed cell
             draw_flags(MINE_COUNT - get_flag_count());
+        }
+
+        if (old_hover_x != 0xff && old_hover_y != 0xff && game_running)
+        {
+            draw_cell_blink(old_hover_x, old_hover_y, hover_blink_on);
+
+            hover_blink_time -= 1;
+            if (hover_blink_time == 0)
+            {
+                hover_blink_time = BLINK_TIME;
+                hover_blink_on = !hover_blink_on;
+            }
         }
     }
 }
