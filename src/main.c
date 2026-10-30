@@ -207,6 +207,7 @@ static void main_game_update(bool *game_running, const actions_t *actions)
             draw_board();
             draw_sad_face();
             *game_running = false;
+            play_lose();
         }
         else
         {
@@ -218,6 +219,7 @@ static void main_game_update(bool *game_running, const actions_t *actions)
         {
             draw_happy_face();
             *game_running = false;
+            play_win();
         }
     }
     else if (actions->just_pressed_alternate)
@@ -320,6 +322,7 @@ int main(void)
                 draw_level(current_level);
                 draw_flags(get_mines_for_level(current_level));
                 set_game_level(current_level);
+                play_press();
             }
 
             if (game_running)
@@ -332,6 +335,8 @@ int main(void)
 
                 time_counter = 0;
                 game_time = 0;
+
+                play_start();
             }
         }
     }

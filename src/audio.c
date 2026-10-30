@@ -38,13 +38,35 @@ typedef struct
 static const instrument_t ins_click = {.duty = 64, .attack = 0x00, .decay = 0xF1, .release = PSG_WAVE_SQUARE | 0x0};
 static const instrument_t ins_flag_put = {.duty = 128, .attack = 0x00, .decay = 0xF3, .release = PSG_WAVE_SQUARE | 0x2};
 static const instrument_t ins_flag_remove = {.duty = 128, .attack = 0x00, .decay = 0xF3, .release = PSG_WAVE_SQUARE | 0x2};
+static const instrument_t ins_start = {64, 0x02, 0x10, PSG_WAVE_SINE | 0x4};
+static const instrument_t ins_win = {64, 0x01, 0xF8, PSG_WAVE_SQUARE | 0x8};
+static const instrument_t ins_boom = {128, 0x00, 0xF9, PSG_WAVE_NOISE | 0x9};
+static const instrument_t ins_lose = {128, 0x13, 0xF7, PSG_WAVE_SAWTOOTH | 0x7};
 
 static const uint8_t attack_frames[16] = {1, 1, 1, 2, 3, 4, 5, 5, 6, 15, 30, 48, 60, 180, 255, 255};
 static const uint8_t decay_frames[16] = {1, 2, 3, 5, 7, 11, 13, 15, 18, 45, 90, 144, 180, 255, 255, 255};
 
 static const step_t seq_click[] = {{.freq = G3, .frames = 0}};
-static const step_t seq_flag_on[] = {{.freq = C5, .frames = 3}, {.freq = G5, .frames = 0}};
-static const step_t seq_flag_off[] = {{.freq = G5, .frames = 3}, {.freq = C5, .frames = 0}};
+static const step_t seq_flag_on[] = {{.freq = C5, .frames = 3}, //
+                                     {.freq = G5, .frames = 0}};
+static const step_t seq_flag_off[] = {{.freq = G5, .frames = 3}, //
+                                      {.freq = C5, .frames = 0}};
+static const step_t seq_start[] = {{.freq = C5, .frames = 4}, //
+                                   {E5, 4},                   //
+                                   {G5, 4},                   //
+                                   {C6, 0}};
+static const step_t seq_win[] = {{.freq = G4, .frames = 5}, //
+                                 {C5, 5},                   //
+                                 {E5, 5},                   //
+                                 {G5, 12},                  //
+                                 {E5, 5},                   //
+                                 {C6, 0}};
+static const step_t seq_boom[] = {{.freq = 1200, .frames = 0}};
+static const step_t seq_lose[] = {{.freq = REST, .frames = 15}, //
+                                  {E4, 15},                     //
+                                  {DS4, 15},                    //
+                                  {D4, 15},                     //
+                                  {CS4, 0}};
 
 static const step_t *sequence_ptr[8];
 static const instrument_t *sequence_ins[8];
@@ -115,6 +137,22 @@ void play_remove_flag()
     play(1, &ins_flag_remove, seq_flag_off);
 }
 
+void play_start()
+{
+    play(2, &ins_start, seq_start);
+}
+
+void play_win()
+{
+    play(2, &ins_win, seq_win);
+}
+
+void play_lose()
+{
+    play(4, &ins_boom, seq_boom);
+    play(2, &ins_lose, seq_lose);
+}
+
 void audio_update()
 {
     for (uint8_t ch = 0; ch < 8; ++ch)
@@ -124,12 +162,6 @@ void audio_update()
             if (--sequence_timer[ch] == 0)
             {
                 play_step(ch);
-            }
-            else if (sequence_timer[ch] == 1)
-            {
-                // Stop audio one frame before
-                xram0_poke8(GATE_ADDR(ch), 0);
-                gate_timer[ch] = 0;
             }
         }
 

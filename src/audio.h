@@ -2,9 +2,14 @@
 #define MY_RP6502_PROJECT_AUDIO_H
 
 void audio_init();
+
 void play_press();
 void play_put_flag();
 void play_remove_flag();
+void play_start();
+void play_win();
+void play_lose();
+
 void audio_update();
 
 #endif // MY_RP6502_PROJECT_AUDIO_H
