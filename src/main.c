@@ -13,6 +13,9 @@
 static bool hover_blink_on;
 static uint8_t hover_blink_time;
 
+static uint8_t time_counter = 0;
+static int16_t game_time = 0;
+
 static void draw_board_borders()
 {
     const uint8_t h = get_board_height();
@@ -222,6 +225,17 @@ static void main_game_update(bool *game_running, const actions_t *actions)
         draw_flags(max(left_mines, 0));
     }
 
+    time_counter += 1;
+    if (time_counter >= 60)
+    {
+        time_counter = 0;
+        if (game_time < 999)
+{
+            game_time += 1;
+        }
+        draw_time(game_time);
+    }
+
     if (*game_running)
     {
         draw_cell_blink(old_hover_x, old_hover_y, hover_blink_on);
@@ -293,6 +307,9 @@ int main(void)
 
                 board_init();
                 draw_board();
+
+                time_counter = 0;
+                game_time = 0;
             }
         }
     }
