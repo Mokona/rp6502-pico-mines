@@ -15,6 +15,9 @@ typedef struct
     bool previous_space_bar_pressed;
     bool previous_alternate_pressed;
     bool previous_left_pressed;
+    bool previous_right_pressed;
+    bool previous_up_pressed;
+    bool previous_down_pressed;
 } keyboard_previous_t;
 
 static keyboard_previous_t keyboard_previous;
@@ -61,6 +64,18 @@ const actions_t *input_action_update()
     const bool left_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_ARROW_LEFT);
     actions.just_pressed_left = left_pressed && !keyboard_previous.previous_left_pressed;
     keyboard_previous.previous_left_pressed = left_pressed;
+
+    const bool right_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_ARROW_RIGHT);
+    actions.just_pressed_right = right_pressed && !keyboard_previous.previous_right_pressed;
+    keyboard_previous.previous_right_pressed = right_pressed;
+
+    const bool up_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_ARROW_UP);
+    actions.just_pressed_up = up_pressed && !keyboard_previous.previous_up_pressed;
+    keyboard_previous.previous_up_pressed = up_pressed;
+
+    const bool down_pressed = KEYBOARD_PRESSED(kb.keys, HID_KEY_ARROW_DOWN);
+    actions.just_pressed_down = down_pressed && !keyboard_previous.previous_down_pressed;
+    keyboard_previous.previous_down_pressed = down_pressed;
 
     // Tablet
     tablet_read(&tab);

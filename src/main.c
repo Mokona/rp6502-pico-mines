@@ -84,13 +84,16 @@ static void draw_board()
 
 static void draw_cell_blink(uint8_t x, uint8_t y, bool blink)
 {
-    if (blink)
+    if (x != 0xff && y != 0xff)
     {
-        display_tile_at(BOARD_DISPLAY_X + x, BOARD_DISPLAY_Y + y, BG__C);
-    }
-    else
-    {
-        draw_cell(x, y);
+        if (blink)
+        {
+            display_tile_at(BOARD_DISPLAY_X + x, BOARD_DISPLAY_Y + y, BG__C);
+        }
+        else
+        {
+            draw_cell(x, y);
+        }
     }
 }
 
@@ -109,8 +112,8 @@ int main(void)
     hover_blink_on = false;
     hover_blink_time = BLINK_TIME;
 
-    uint8_t old_hover_x = 0;
-    uint8_t old_hover_y = 0;
+    uint8_t old_hover_x = get_board_width() / 2;
+    uint8_t old_hover_y = get_board_height() / 2;
 
     bool game_running = true;
 
@@ -129,7 +132,6 @@ int main(void)
             const int8_t tentative_hover_cell_x = (int8_t)(actions->pointer_x / 16 - BOARD_DISPLAY_X);
             const int8_t tentative_hover_cell_y = (int8_t)(actions->pointer_y / 16 - BOARD_DISPLAY_Y);
 
-
             if ((tentative_hover_cell_x >= 0 && tentative_hover_cell_x < get_board_width()) &&
                 (tentative_hover_cell_y >= 0 && tentative_hover_cell_y < get_board_height()))
             {
@@ -138,24 +140,17 @@ int main(void)
 
                 if (hover_cell_x != old_hover_x || hover_cell_y != old_hover_y)
                 {
-                    if (old_hover_x != 0xff && old_hover_y != 0xff)
-                    {
-                        draw_cell_blink(old_hover_x, old_hover_y, false);
-                    }
+                    draw_cell_blink(old_hover_x, old_hover_y, false);
+                    hover_blink_on = true;
+                    hover_blink_time = BLINK_TIME;
 
                     old_hover_x = hover_cell_x;
                     old_hover_y = hover_cell_y;
-
-                    hover_blink_on = true;
-                    hover_blink_time = BLINK_TIME;
                 }
             }
             else
             {
-                if (old_hover_x != 0xff && old_hover_y != 0xff)
-                {
-                    draw_cell_blink(old_hover_x, old_hover_y, false);
-                }
+                draw_cell_blink(old_hover_x, old_hover_y, false);
 
                 old_hover_x = 0xff;
                 old_hover_y = 0xff;
@@ -168,9 +163,53 @@ int main(void)
 #endif
         }
 
+        // TODO: simplify the duplicated code
         if (actions->just_pressed_left)
         {
-            puts("DPAD_LEFT");
+            draw_cell_blink(old_hover_x, old_hover_y, false);
+            hover_blink_on = true;
+            hover_blink_time = BLINK_TIME;
+
+            if (old_hover_x > 0)
+            {
+                old_hover_x -= 1;
+            }
+        }
+
+        if (actions->just_pressed_right)
+        {
+            draw_cell_blink(old_hover_x, old_hover_y, false);
+            hover_blink_on = true;
+            hover_blink_time = BLINK_TIME;
+
+            if (old_hover_x < get_board_width() - 1)
+            {
+                old_hover_x += 1;
+            }
+        }
+
+        if (actions->just_pressed_up)
+        {
+            draw_cell_blink(old_hover_x, old_hover_y, false);
+            hover_blink_on = true;
+            hover_blink_time = BLINK_TIME;
+
+            if (old_hover_y > 0)
+            {
+                old_hover_y -= 1;
+            }
+        }
+
+        if (actions->just_pressed_down)
+        {
+            draw_cell_blink(old_hover_x, old_hover_y, false);
+            hover_blink_on = true;
+            hover_blink_time = BLINK_TIME;
+
+            if (old_hover_y < get_board_height() - 1)
+            {
+                old_hover_y += 1;
+            }
         }
 
         if (actions->just_pressed_action)
@@ -206,7 +245,7 @@ int main(void)
             draw_flags(MINE_COUNT - get_flag_count());
         }
 
-        if (old_hover_x != 0xff && old_hover_y != 0xff && game_running)
+        if (game_running)
         {
             draw_cell_blink(old_hover_x, old_hover_y, hover_blink_on);
 
