@@ -196,7 +196,6 @@ static void main_game_update(bool *game_running, const actions_t *actions)
 
     if (actions->just_pressed_action)
     {
-        play_press();
         press_on_cell(old_hover_x, old_hover_y);
         draw_board(); // TODO: optimize by displaying only the changed cell
 

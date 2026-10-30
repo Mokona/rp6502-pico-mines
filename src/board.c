@@ -1,5 +1,7 @@
 #include "board.h"
 
+#include "audio.h"
+
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
@@ -285,6 +287,11 @@ void press_on_cell(uint8_t x, uint8_t y)
         {
             new_status = ECell_Exploded;
         }
+        if (new_status == ECell_Uncovered)
+        {
+            play_press();
+        }
+
         board_status[XY_TO_INDEX(x, y)] = new_status;
         uncovered_count += 1;
     }
